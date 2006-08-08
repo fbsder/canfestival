@@ -123,7 +123,6 @@ while [ $# -ge 1 ]; do
 		echo	"		\"unix\" for unix-like systems"
 		echo	"		\"win32\" for win32 systems"
 		echo	"		\"hcs12\" for HCS12 micro-controller"
-		echo	"		\"ecos_lpc2138_sja1000\" for eCOS + Philips ARM LPC21381 + Philips SJA1000" 
 		echo 	" --can=foo	Use 'foo' as CAN driver (can be either 'peak', 'lincan' or 'virtual')"
 		echo 	" --timers=foo	Use 'foo' as TIMERS driver (can be either 'unix' or 'xeno')"
 		echo	" --disable-Ox	Disable gcc \"-Ox\" optimizations."
@@ -597,21 +596,12 @@ MAKEFILES=$MAKEFILES\ drivers/$SUB_TARGET/Makefile.in
 
 if [ "$SUB_TARGET" = "unix" ]; then
 	MAKEFILES=$MAKEFILES\
-\	examples/AppliMaster_Linux/Makefile.in\
-\	examples/AppliSlave_Linux/Makefile.in\
 \	examples/TestMasterSlave/Makefile.in
 fi
 
 if [ "$SUB_TARGET" = "hcs12" ]; then
 	MAKEFILES=$MAKEFILES\
-\	examples/AppliMaster_HCS12/Makefile.in\
-\	examples/AppliSlave_HCS12/Makefile.in\
 \	examples/gene_SYNC_HCS12/Makefile.in
-fi
-
-if [ "$SUB_TARGET" = "ecos_lpc2138_sja1000" ]; then
-	MAKEFILES=$MAKEFILES\
-\	examples/ecos_lpc2138_sja1000/src/Makefile.in
 fi
 
 for makefile_in in $MAKEFILES; do
