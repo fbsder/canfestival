@@ -981,7 +981,7 @@ class objdictedit(wx.Frame):
         event.Skip()
 
     def OnFileSelectedChanged(self, event):
-        selected = self.FileOpened.GetSelection()
+        selected = event.GetSelection()
         # At init selected = -1
         if selected >= 0:
         	self.Manager.ChangeCurrentNode(selected)
@@ -1701,9 +1701,9 @@ class MapVariableDialog(wx.Dialog):
     def GetValues(self):
         if self.radioButton1.GetValue():
             struct = 1
-        elif self.radioButton3.GetValue():
-            struct = 3
         elif self.radioButton2.GetValue():
+            struct = 3
+        elif self.radioButton3.GetValue():
             struct = 7
         name = self.IndexName.GetValue()
         index = eval(self.Index.GetValue())
