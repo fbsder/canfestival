@@ -42,7 +42,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -84,7 +85,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -126,7 +128,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -174,7 +177,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
+				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool

@@ -24,6 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -107,6 +108,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="./configure.win32.bat"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
