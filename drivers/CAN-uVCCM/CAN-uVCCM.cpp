@@ -1,4 +1,5 @@
-// CAN-uVCCM adapter driver for CanFestival-3 Win32 port
+// CAN-uVCCM adapter (http://www.gridconnect.com)
+// driver for CanFestival-3 Win32 port
 // Copyright (C) 2007 Leonid Tochinski, ChattenAssociates, Inc.
 
 
