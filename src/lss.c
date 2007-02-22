@@ -80,10 +80,10 @@ UNS32 lss_buffer[10];
 void lss_copy(UNS8 *data, UNS32 value)
 /* transfert 32 bits value into uns8 data vector */
 {
-	data[0] = value & 0xff;
-	data[1] = (value>>8) & 0xff;
-	data[2] = (value>>16) & 0xff;
-	data[3] = (value>>24) & 0xff;
+	data[0] = (UNS8)value & 0xff;
+	data[1] = (UNS8)(value>>8) & 0xff;
+	data[2] = (UNS8)(value>>16) & 0xff;
+	data[3] = (UNS8)(value>>24) & 0xff;
 }
 
 
