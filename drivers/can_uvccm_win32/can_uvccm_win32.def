@@ -1,4 +1,4 @@
-LIBRARY	CAN-uVCCM
+LIBRARY	can_uvccm_win32
 
 EXPORTS
    canReceive_driver

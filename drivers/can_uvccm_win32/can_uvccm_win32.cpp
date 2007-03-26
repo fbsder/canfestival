@@ -1,4 +1,4 @@
-// CAN-uVCCM adapter (http://www.gridconnect.com)
+// can_uvccm_win32 adapter (http://www.gridconnect.com)
 // driver for CanFestival-3 Win32 port
 // Copyright (C) 2007 Leonid Tochinski, ChattenAssociates, Inc.
 
@@ -14,14 +14,14 @@
 #include "can_driver.h"
 
 
-class CAN_uVCCM
+class can_uvccm_win32
    {
    public:
       class error
         {
         };
-      CAN_uVCCM(s_BOARD *board);
-      ~CAN_uVCCM();
+      can_uvccm_win32(s_BOARD *board);
+      ~can_uvccm_win32();
       bool send(const Message *m);
       bool receive(Message *m);
    private:
@@ -37,7 +37,7 @@ class CAN_uVCCM
       std::string m_residual_buffer;
    };
 
-CAN_uVCCM::CAN_uVCCM(s_BOARD *board) : m_port(INVALID_HANDLE_VALUE),
+can_uvccm_win32::can_uvccm_win32(s_BOARD *board) : m_port(INVALID_HANDLE_VALUE),
       m_read_event(0),
       m_write_event(0),
       m_d(board->d)
@@ -46,17 +46,17 @@ CAN_uVCCM::CAN_uVCCM(s_BOARD *board) : m_port(INVALID_HANDLE_VALUE),
       throw error();
    }
 
-CAN_uVCCM::~CAN_uVCCM()
+can_uvccm_win32::~can_uvccm_win32()
    {
    close_rs232();
    }
 
-bool CAN_uVCCM::send(const Message *m)
+bool can_uvccm_win32::send(const Message *m)
    {
    if (m_port == INVALID_HANDLE_VALUE)
       return false;
 
-   // build CAN-uVCCM command string
+   // build can_uvccm_win32 command string
    std::string can_cmd;
    set_can_data(*m, can_cmd);
 
@@ -79,7 +79,7 @@ bool CAN_uVCCM::send(const Message *m)
    }
 
 
-bool CAN_uVCCM::receive(Message *m)
+bool can_uvccm_win32::receive(Message *m)
    {
    if (m_port == INVALID_HANDLE_VALUE)
       return false;
@@ -135,7 +135,7 @@ bool CAN_uVCCM::receive(Message *m)
    return result;
    }
 
-bool CAN_uVCCM::open_rs232(int port, int baud_rate)
+bool can_uvccm_win32::open_rs232(int port, int baud_rate)
    {
    if (m_port != INVALID_HANDLE_VALUE)
       return true;
@@ -189,7 +189,7 @@ bool CAN_uVCCM::open_rs232(int port, int baud_rate)
    return true;
    }
 
-bool CAN_uVCCM::close_rs232()
+bool can_uvccm_win32::close_rs232()
    {
    if (m_port != INVALID_HANDLE_VALUE)
       {
@@ -205,7 +205,7 @@ bool CAN_uVCCM::close_rs232()
    return true;
    }
 
-bool CAN_uVCCM::get_can_data(const char* can_cmd_buf, long& bufsize, Message* m)
+bool can_uvccm_win32::get_can_data(const char* can_cmd_buf, long& bufsize, Message* m)
    {
    if (bufsize < 5)
       {
@@ -270,9 +270,9 @@ bool CAN_uVCCM::get_can_data(const char* can_cmd_buf, long& bufsize, Message* m)
    return true;
    }
 
-bool CAN_uVCCM::set_can_data(const Message& m, std::string& can_cmd)
+bool can_uvccm_win32::set_can_data(const Message& m, std::string& can_cmd)
    {
-   // build CAN-uVCCM command string
+   // build can_uvccm_win32 command string
    std::ostringstream can_cmd_str;
    can_cmd_str << ":S" << std::hex << m.cob_id.w;
    if (m.rtr == REQUEST)
@@ -300,13 +300,13 @@ bool CAN_uVCCM::set_can_data(const Message& m, std::string& can_cmd)
 extern "C"
    UNS8 canReceive_driver(void* inst, Message *m)
    {
-   return (UNS8)reinterpret_cast<CAN_uVCCM*>(inst)->receive(m);
+   return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->receive(m);
    }
 
 extern "C"
    UNS8 canSend_driver(void* inst, const Message *m)
    {
-   return (UNS8)reinterpret_cast<CAN_uVCCM*>(inst)->send(m);
+   return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->send(m);
    }
 
 extern "C"
@@ -314,9 +314,9 @@ extern "C"
    {
    try
       {
-      return new CAN_uVCCM(board);
+      return new can_uvccm_win32(board);
       }
-   catch (CAN_uVCCM::error&)
+   catch (can_uvccm_win32::error&)
       {
       return 0;
       }
@@ -325,6 +325,6 @@ extern "C"
 extern "C"
    int canClose_driver(void* inst)
    {
-   delete reinterpret_cast<CAN_uVCCM*>(inst);
+   delete reinterpret_cast<can_uvccm_win32*>(inst);
    return 1;
    }

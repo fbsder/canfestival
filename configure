@@ -96,6 +96,8 @@ while [ $# -ge 1 ]; do
 	--prefix=*)	SUB_PREFIX=$optarg;;
 	--target=*)	SUB_TARGET=$optarg;;
 	--can=*)	SUB_CAN_DRIVER=$optarg;;
+	--led=*)	SUB_LED_DRIVER=$optarg;;
+	--nvram=*)	SUB_NVRAM_DRIVER=$optarg;;
 	--timers=*)	SUB_TIMERS_DRIVER=$optarg;;
 	--disable-Ox)	DISABLE_OPT=1;
 			echo "On user request: Won't optimize with \"-Ox\"";;
@@ -103,6 +105,8 @@ while [ $# -ge 1 ]; do
 			echo "Debug messages enabled !!";;
 	--debugPDO)	DEBUG=PDO;
 			echo "Debug messages (PDO) enabled !!";;
+	--enable-lss)	SUB_LSS_ENABLE=YES;
+			echo "On user request: Will enable Auto Baudrate detect Feature";;
 	--desable-timers)	SUB_TIMERS_ENABLE=NO;
 			echo "On user request: Will enable built-in timer dispatch Feature";;
 	--MAX_CAN_BUS_ID=*)	MAX_CAN_BUS_ID=$1;;
@@ -114,20 +118,33 @@ while [ $# -ge 1 ]; do
 	--MAX_NB_TIMER=*) MAX_NB_TIMER=$1;;
 	--help)	echo	"Usage: ./configure [options]"
     		echo	"Options:"
-    		echo 	" --cc=foo	Use compiler 'foo' instead of defaults ${CC1} or ${CC2}."
-		echo 	" --arch=foo	Use architecture 'foo' instead of trying to autodetect."
-		echo 	" --os=foo	Use operative system 'foo' instead of trying to autodetect."
-		echo 	" --prefix=foo	Use prefix 'foo' instead of default ${SUB_PREFIX}."
-		echo 	" --target=foo	Use 'foo' as build target."
-		echo	"		\"generic\" for have independant CAN and TIMERS driver"
-		echo	"		\"unix\" for unix-like systems"
-		echo	"		\"win32\" for win32 systems"
-		echo	"		\"hcs12\" for HCS12 micro-controller"
-		echo 	" --can=foo	Use 'foo' as CAN driver (can be either 'peak', 'lincan' or 'virtual')"
-		echo 	" --timers=foo	Use 'foo' as TIMERS driver (can be either 'unix' or 'xeno')"
-		echo	" --disable-Ox	Disable gcc \"-Ox\" optimizations."
-		echo	" --debug	Enable debug messages."
-		echo	" --debugPDO	Enable debug messages, using PDO."
+    		echo 	" --cc=foo      Use compiler 'foo' instead of defaults ${CC1} or ${CC2}."
+		echo 	" --arch=foo    Use architecture 'foo' instead of trying to autodetect."
+		echo 	" --os=foo      Use operative system 'foo' instead of trying to autodetect."
+		echo 	" --prefix=foo  Use prefix 'foo' instead of default ${SUB_PREFIX}."
+		echo 	" --target=foo  Use 'foo' as build target."
+		echo	"               \"generic\" for have independant CAN and TIMERS driver"
+		echo	"               \"unix\" for unix-like systems"
+		echo	"               \"win32\" for win32 systems"
+		echo	"               \"hcs12\" for HCS12 micro-controller"
+		echo	"               \"ecos_lpc2138_sja1000\" for eCOS + Philips ARM LPC21381 + Philips SJA1000" 
+		echo 	" --can=foo	Use 'foo' as CAN driver"
+		echo	"               \"peak_linux\" use Linux build host installed Peak driver and library"
+		echo	"                                please see http://www.peak-system.com/linux/"
+		echo	"               \"peak_cygwin\" use win32 PcanLight Peak driver and library with Cygwin" 
+		echo	"                                please see http://www.peak-system.com/themen/download_gb.html"
+		echo	"               \"virtual\" use unix pipe based virtual can driver"
+		echo	"               \"socket\" use socket-can  "
+		echo	"                                please see http://developer.berlios.de/projects/socketcan/"
+		echo	"               \"lincan\" for HCS12 micro-controller"
+		echo	"                                please see http://www.ocera.org/download/components/WP7/lincan-0.3.3.html"
+		echo 	" --timers=foo  Use 'foo' as TIMERS driver (can be either 'unix' or 'xeno')"
+		echo	" --led=foo     Use 'foo' as DS-305 LED driver (use 'none' to disable or 'stdout')"
+		echo	" --nvram=foo   Use 'foo' as NVRAM driver (use 'none' to disable or 'file')"
+		echo	" --disable-Ox  Disable gcc \"-Ox\" optimizations."
+		echo	" --debug       Enable debug messages."
+		echo	" --debugPDO    Enable debug messages, using PDO."
+		echo	" --enable-lss  Enable Auto Baudrate detect Feature"
 		echo
 		echo	"Stack compilation constants"
 		echo	" --MAX_CAN_BUS_ID [=1] Number of can bus to use"
@@ -335,15 +352,25 @@ if [ "$SUB_CAN_DRIVER" = "" ]; then
 	if [ "$SUB_TARGET" = "unix" ]; then
 		if [ -e /usr/lib/libpcan.so ]; then 
 			echo "Choosing installed Peak driver as CAN driver."
-			SUB_CAN_DRIVER=peak
+			SUB_CAN_DRIVER=peak_linux
+		elif [ "$SUB_OS_NAME" = "CYGWIN" -a "PCAN_LIB" != "" ]; then
+			echo "Choosing installed Peak driver as CAN driver."
+			SUB_CAN_DRIVER=peak_cygwin		
 		else
 			echo "Choosing virtual CAN driver."
 			SUB_CAN_DRIVER=virtual
 		fi
 	fi
-	if [ "$SUB_TARGET" = "win32" ]; then
-		echo "CAN driver for windows --Not Implemented--"
-	fi
+fi
+
+if [ "$SUB_TARGET" = "unix" -a "$SUB_LED_DRIVER" = "" ]; then
+	echo "Choosing stdout LED driver."
+	SUB_LED_DRIVER=stdout
+fi
+
+if [ "$SUB_TARGET" = "unix" -a "$SUB_NVRAM_DRIVER" = "" ]; then
+	echo "Choosing binary file NVRAM driver. -- not implemented --"
+#	SUB_NVRAM_DRIVER=file
 fi
 
 # If target is unix, default timers also
@@ -397,6 +424,25 @@ if [ "$SUB_TARGET" = "hcs12" ]; then
 	fi
 fi	
 
+if [ "$SUB_TARGET" = "ecos_lpc2138_sja1000" ]; then
+	# search for gcc arm compiler arm-elf-gcc or arm-elf-gcc ?
+	if [ "$CC" = "" ]; then
+		which arm-elf-gcc >/dev/null 2>&1
+		if (( $? )); then 
+			echo "error : Could not find arm-elf-gcc"
+		else
+			CC=arm-elf-gcc
+			SUB_PROG_CFLAGS="-mcpu=arm7tdmi -Wall -Wpointer-arith -Wstrict-prototypes -Winline -Wundef -Os \
+                        -ffunction-sections -fdata-sections -fno-exceptions -finline-functions"
+		fi
+	fi
+	# ecos sja1000 driver implements calls needed by LSS.
+	SUB_LSS_ENABLE=YES
+	SUB_LED_ENABLE=YES
+	SUB_NVRAM_ENABLE=YES
+fi
+
+
 #### CAN_DRIVER ####
 
 if [ "$SUB_CAN_DRIVER" = "peak" ]; then
@@ -406,29 +452,29 @@ if [ "$SUB_CAN_DRIVER" = "peak" ]; then
     SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -lpcan
 fi
 
-if [ "$SUB_CAN_DRIVER" = "peak_win32" ]; then
+if [ "$SUB_CAN_DRIVER" = "peak_cygwin" ]; then
 	if [ "$PCAN_HEADER" = "" -o "PCAN_LIB" = "" ]; then
 		echo "!!! ERROR !!! Please set PCAN_LIB PCAN_HEADER [PCAN_INCLUDE] to appropriate paths ! "
 	fi
    	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -liberty\ \'$PCAN_LIB\'
-	echo "Converting PcanLib header files for gcc -> /drivers/can_peak_win32/cancfg.h"
-	cat include/can_peak_win32/cancfg.h.head $PCAN_INCLUDE/$PCAN_HEADER > include/can_peak_win32/cancfg.h
+	echo "Converting PcanLib header files for gcc -> /drivers/can_peak_cygwin/cancfg.h"
+	cat include/can_peak_cygwin/cancfg.h.head $PCAN_INCLUDE/$PCAN_HEADER > include/can_peak_cygwin/cancfg.h
 	# second port handling
 	if [ "$PCAN2_HEADER" != "" ]; then
 		echo "Stripping down second Pcan Light header "
-		echo >> include/can_peak_win32/cancfg.h
-		echo "// Stripped PcanLight header to prevent typedef conflicts ">> include/can_peak_win32/cancfg.h
-		echo >> include/can_peak_win32/cancfg.h
-		grep __stdcall $PCAN_INCLUDE/$PCAN2_HEADER >> include/can_peak_win32/cancfg.h
+		echo >> include/can_peak_cygwin/cancfg.h
+		echo "// Stripped PcanLight header to prevent typedef conflicts ">> include/can_peak_cygwin/cancfg.h
+		echo >> include/can_peak_cygwin/cancfg.h
+		grep __stdcall $PCAN_INCLUDE/$PCAN2_HEADER >> include/can_peak_cygwin/cancfg.h
 	   	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ \'$PCAN2_LIB\'
-		echo '#define PCAN2_HEADER_' >> include/can_peak_win32/cancfg.h
+		echo '#define PCAN2_HEADER_' >> include/can_peak_cygwin/cancfg.h
 	fi
-	if grep -q CANHwType include/can_peak_win32/cancfg.h ; then
+	if grep -q CANHwType include/can_peak_cygwin/cancfg.h ; then
 		echo "Peak Init HwType, IO_Port and IRQ will be passed in environment :"
 		echo "	PCANHwType PCANIO_Port PCANInterupt"
-		echo '#define extra_PCAN_init_params' >> include/can_peak_win32/cancfg.h
+		echo '#define extra_PCAN_init_params' >> include/can_peak_cygwin/cancfg.h
 	fi
-	cat include/can_peak_win32/cancfg.h.tail >> include/can_peak_win32/cancfg.h
+	cat include/can_peak_cygwin/cancfg.h.tail >> include/can_peak_cygwin/cancfg.h
 fi
 
 if [ "$SUB_CAN_DRIVER" = "none" ]; then
@@ -452,6 +498,36 @@ fi
 
 if [ "$SUB_TIMERS_DRIVER" = "none" ]; then
 	SUB_TIMERS_DRIVER=
+fi
+
+#### LED_DRIVER ####
+#enable led support if a led driver have been selected.
+if [ "$SUB_LED_DRIVER" != "" ]; then
+	SUB_LED_ENABLE=YES
+fi
+#if "none" driver is selected led feature is enabled but driver not compiled
+if [ "$SUB_LED_DRIVER" = "none" ]; then
+	SUB_LED_DRIVER=
+fi
+#if "disable" driver is selected led feature is disabled
+if [ "$SUB_LED_DRIVER" = "disable" ]; then
+	SUB_LED_ENABLE=
+	SUB_LED_DRIVER=
+fi
+
+#### NVRAM_DRIVER ####
+#enable nvram support if a nvram driver have been selected.
+if [ "$SUB_NVRAM_DRIVER" != "" ]; then
+	SUB_NVRAM_ENABLE=YES
+fi
+#if "none" driver is selected nvram feature is enabled but driver not compiled
+if [ "$SUB_NVRAM_DRIVER" = "none" ]; then
+	SUB_NVRAM_DRIVER=
+fi
+#if "disable" driver is selected nvram feature is disabled
+if [ "$SUB_NVRAM_DRIVER" = "disable" ]; then
+	SUB_NVRAM_ENABLE=
+	SUB_NVRAM_DRIVER=
 fi
 
 ###########################################################################
@@ -624,17 +700,36 @@ if [ "$SUB_CAN_DRIVER" != "" ]; then
 \	drivers/can_$SUB_CAN_DRIVER/Makefile.in
 fi
 
+if [ "$SUB_LED_DRIVER" != "" ]; then
+	MAKEFILES=$MAKEFILES\
+\	drivers/led_$SUB_LED_DRIVER/Makefile.in
+fi
+
+if [ "$SUB_NVRAM_DRIVER" != "" ]; then
+	MAKEFILES=$MAKEFILES\
+\	drivers/nvram_$SUB_NVRAM_DRIVER/Makefile.in
+fi
+
 # Target dependent Makefiles
 MAKEFILES=$MAKEFILES\ drivers/$SUB_TARGET/Makefile.in
 
 if [ "$SUB_TARGET" = "unix" ]; then
 	MAKEFILES=$MAKEFILES\
+\	examples/AppliMaster_Linux/Makefile.in\
+\	examples/AppliSlave_Linux/Makefile.in\
 \	examples/TestMasterSlave/Makefile.in
 fi
 
 if [ "$SUB_TARGET" = "hcs12" ]; then
 	MAKEFILES=$MAKEFILES\
+\	examples/AppliMaster_HCS12/Makefile.in\
+\	examples/AppliSlave_HCS12/Makefile.in\
 \	examples/gene_SYNC_HCS12/Makefile.in
+fi
+
+if [ "$SUB_TARGET" = "ecos_lpc2138_sja1000" ]; then
+	MAKEFILES=$MAKEFILES\
+\	examples/ecos_lpc2138_sja1000/src/Makefile.in
 fi
 
 for makefile_in in $MAKEFILES; do
@@ -650,9 +745,14 @@ for makefile_in in $MAKEFILES; do
 	s:SUB_OPT_CFLAGS:${SUB_OPT_CFLAGS}:
 	s:SUB_TARGET:${SUB_TARGET}:
 	s:SUB_BINUTILS_PREFIX:${SUB_BINUTILS_PREFIX}:
+	s:SUB_LSS_ENABLE:${SUB_LSS_ENABLE}:
+	s:SUB_LED_ENABLE:${SUB_LED_ENABLE}:
+	s:SUB_NVRAM_ENABLE:${SUB_NVRAM_ENABLE}:
 	s:SUB_TIMERS_ENABLE:${SUB_TIMERS_ENABLE}:
 	s:SUB_TIMERS_DRIVER:timers_${SUB_TIMERS_DRIVER}:
 	s:SUB_CAN_DRIVER:can_${SUB_CAN_DRIVER}:
+	s:SUB_LED_DRIVER:led_${SUB_LED_DRIVER}:
+	s:SUB_NVRAM_DRIVER:nvram_${SUB_NVRAM_DRIVER}:
 	" > $makefile
 done
 

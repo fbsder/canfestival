@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="CAN-uVCCM"
+	Name="can_uvccm_win32"
 	ProjectGUID="{39E3300A-29B4-4AA7-AF62-3B181FC26155}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -32,14 +32,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/CAN-uVCCM.dll"
+				OutputFile="$(OutDir)/can_uvccm_win32.dll"
 				LinkIncremental="2"
-				ModuleDefinitionFile="CAN-uVCCM.def"
+				ModuleDefinitionFile="can_uvccm_win32.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/CAN-uVCCM.pdb"
+				ProgramDatabaseFile="$(OutDir)/can_uvccm_win32.pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/CAN-uVCCM.lib"
+				ImportLibrary="$(OutDir)/can_uvccm_win32.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -81,15 +81,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/CAN-uVCCM.dll"
+				OutputFile="$(OutDir)/can_uvccm_win32.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="CAN-uVCCM.def"
+				ModuleDefinitionFile="can_uvccm_win32.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/CAN-uVCCM.lib"
+				ImportLibrary="$(OutDir)/can_uvccm_win32.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -131,15 +131,15 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/CAN-uVCCM.dll"
+				OutputFile="$(OutDir)/can_uvccm_win32.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="CAN-uVCCM.def"
+				ModuleDefinitionFile="can_uvccm_win32.def"
 				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/CAN-uVCCM.lib"
+				ImportLibrary="$(OutDir)/can_uvccm_win32.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -184,14 +184,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/CAN-uVCCM.dll"
+				OutputFile="$(OutDir)/can_uvccm_win32.dll"
 				LinkIncremental="2"
-				ModuleDefinitionFile="CAN-uVCCM.def"
+				ModuleDefinitionFile="can_uvccm_win32.def"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/CAN-uVCCM.pdb"
+				ProgramDatabaseFile="$(OutDir)/can_uvccm_win32.pdb"
 				SubSystem="2"
 				OptimizeForWindows98="1"
-				ImportLibrary="$(OutDir)/CAN-uVCCM.lib"
+				ImportLibrary="$(OutDir)/can_uvccm_win32.lib"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -223,10 +223,10 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\CAN-uVCCM.cpp">
+				RelativePath=".\can_uvccm_win32.cpp">
 			</File>
 			<File
-				RelativePath=".\CAN-uVCCM.def">
+				RelativePath=".\can_uvccm_win32.def">
 			</File>
 		</Filter>
 		<Filter

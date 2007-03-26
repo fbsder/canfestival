@@ -29,7 +29,6 @@ PREFIX = SUB_PREFIX
 TARGET = SUB_TARGET
 CAN_DRIVER = SUB_CAN_DRIVER
 TIMERS_DRIVER = SUB_TIMERS_DRIVER
-BINUTILS_PREFIX = SUB_BINUTILS_PREFIX
 
 INCLUDES = -I../../include -I../../include/$(TARGET) -I../../include/$(CAN_DRIVER) -I../../include/$(TIMERS_DRIVER)
 
@@ -57,12 +56,3 @@ clean:
 	rm -f $(OBJS)
 
 mrproper: clean
-
-#********** make obfuscated translation *************************************
-.PHONY : obfuscate
-obfuscate:
-	cobf -p obf/pp_gnu -o obf -c can_peak_win32.c -t obf/tlist.tok -m obf/mlist.tok -x pcan_ obf/can_peak_win32_org.c;\
-	cat obf/can_peak_win32.c.header  obf/can_peak_win32.c  > can_peak_win32.c;\
-	cat obf/cobf.h.header obf/cobf.h > cobf.h;\
-	rm -f obf/can_peak_win32.c obf/cobf.h obf/cobf.log obf/uncobf.h
-

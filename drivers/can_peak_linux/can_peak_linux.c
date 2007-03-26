@@ -51,7 +51,7 @@ typedef struct {
   CO_Data* d;
 } CANPort;
 
-CANPort canports[MAX_NB_CAN_PORTS] = {{0,},};
+CANPort canports[MAX_NB_CAN_PORTS] = {{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,}};
 
 // Define for rtr CAN message
 #define CAN_INIT_TYPE_ST_RTR MSGTYPE_STANDARD | MSGTYPE_RTR 
