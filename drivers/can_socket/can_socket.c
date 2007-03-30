@@ -83,20 +83,6 @@ UNS8 canReceive(CAN_HANDLE fd0, Message *m)
        return 0;
 }
 
-void canReceiveLoop(CAN_HANDLE fd0)
-{
-       CO_Data* d = fd0->d;
-       Message m;
-
-       while (1) {
-               if (canReceive(fd0, &m) != 0)
-                       break;
-
-               EnterMutex();
-               canDispatch(d, &m);
-               LeaveMutex();
-       }
-}
 
 /***************************************************************************/
 UNS8 canSend(CAN_HANDLE fd0, Message *m)

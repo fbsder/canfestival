@@ -25,34 +25,44 @@ CC = SUB_CC
 OPT_CFLAGS = -O2
 CFLAGS = SUB_OPT_CFLAGS
 PROG_CFLAGS = SUB_PROG_CFLAGS
-LIBS = -lm
-SHAREDLIBOPT = -shared
-OS_NAME = SUB_OS_NAME
-ARCH_NAME = SUB_ARCH_NAME
 PREFIX = SUB_PREFIX
 TARGET = SUB_TARGET
 CAN_DRIVER = SUB_CAN_DRIVER
 TIMERS_DRIVER = SUB_TIMERS_DRIVER
+ENABLE_DLL_DRIVERS=SUB_ENABLE_DLL_DRIVERS
 
-INCLUDES = -I../../include -I../../include/$(TARGET) -I../../include/$(CAN_DRIVER) -I../../include/$(TIMERS_DRIVER)
+INCLUDES = -I../../include -I../../include/$(TARGET) -I../../include/$(CAN_DRIVER)
 
 OBJS = $(CAN_DRIVER).o
+
+ifeq ($(ENABLE_DLL_DRIVERS),1)
+CFLAGS += -fPIC
+DRIVER = libcanfestival_$(CAN_DRIVER).so
+else
+DRIVER = $(OBJS)
+endif
 
 SRC_HFILES = ../../include/$(CAN_DRIVER)/cancfg.h
 
 TARGET_HFILES = $(PREFIX)/include/canfestival/cancfg.h
 
+TARGET_SOFILES = $(PREFIX)/lib/$(DRIVER)
+
 all: driver
 
-driver: $(OBJS)
+driver: $(DRIVER)
 
 %o: %c
 	$(CC) $(CFLAGS) $(PROG_CFLAGS) ${PROGDEFINES} $(INCLUDES) -o $@ -c $<
 
-install:
+libcanfestival_$(CAN_DRIVER).so: $(OBJS)
+	gcc -shared -Wl,-soname,libcanfestival_$(CAN_DRIVER).so -o $@ $<
+
+install: libcanfestival_$(CAN_DRIVER).so
 	mkdir -p $(PREFIX)/include/canfestival
 	cp $(SRC_HFILES) $(PREFIX)/include/canfestival
-
+	mkdir -p $(PREFIX)/lib/
+	
 uninstall:
 	rm -f $(TARGET_HFILES)
 

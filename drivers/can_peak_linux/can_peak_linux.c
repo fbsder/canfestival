@@ -37,31 +37,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libpcan.h" // for CAN_HANDLE
 
-#include <applicfg.h>
-#include "timer.h"
 #include "can_driver.h"
-#include "timers_driver.h"
-
-#define MAX_NB_CAN_PORTS 16
-
-typedef struct {
-  char used;
-  HANDLE fd;
-  TASK_HANDLE receiveTask;
-  CO_Data* d;
-} CANPort;
-
-CANPort canports[MAX_NB_CAN_PORTS] = {{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,}};
 
 // Define for rtr CAN message
 #define CAN_INIT_TYPE_ST_RTR MSGTYPE_STANDARD | MSGTYPE_RTR 
 
 /*********functions which permit to communicate with the board****************/
-UNS8 canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
 {
   UNS8 data; 
   TPCANMsg peakMsg;
-  if ((errno = CAN_Read(((CANPort*)fd0)->fd, & peakMsg))) {		// Blocks until no new message or error.
+  if ((errno = CAN_Read(fd0, & peakMsg))) {		// Blocks until no new message or error.
     if(errno != -EIDRM && errno != -EPERM) // error is not "Can Port closed while reading" 
     {
     	perror("!!! Peak board : error of reading. (from f_can_receive function) \n");
@@ -80,25 +66,8 @@ UNS8 canReceive(CAN_HANDLE fd0, Message *m)
   return 0;
 }
 
-void canReceiveLoop(CAN_HANDLE fd0)
-{
-	CO_Data* d = ((CANPort*)fd0)->d;
-	Message m;
-	while (1) {
-		if(!canReceive(fd0, &m))
-		{
-			EnterMutex();
-			canDispatch(d, &m);
-			LeaveMutex();
-		}else{
-//			printf("canReceive returned error\n");
-			break;
-		}
-	}
-}
-
 /***************************************************************************/
-UNS8 canSend(CAN_HANDLE fd0, Message *m)
+UNS8 _canSend(CAN_HANDLE fd0, Message *m)
 {
   UNS8 data;
   TPCANMsg peakMsg;
@@ -113,7 +82,7 @@ UNS8 canSend(CAN_HANDLE fd0, Message *m)
   for(data = 0 ; data <  m->len; data ++)
   	peakMsg.DATA[data] = m->data[data];         	/* data bytes, up to 8 */
   
-  if((errno = CAN_Write(((CANPort*)fd0)->fd, & peakMsg))) {
+  if((errno = CAN_Write(fd0, & peakMsg))) {
     perror("!!! Peak board : error of writing. (from canSend function) \n");
     return 1;
   }
@@ -121,48 +90,46 @@ UNS8 canSend(CAN_HANDLE fd0, Message *m)
 
 }
 
+
 /***************************************************************************/
-CAN_HANDLE canOpen(s_BOARD *board)
+int TranslateBaudeRate(char* optarg){
+	if(!strcmp( optarg, "1M")) return CAN_BAUD_1M;
+	if(!strcmp( optarg, "500K")) return CAN_BAUD_500K;
+	if(!strcmp( optarg, "250K")) return CAN_BAUD_250K;
+	if(!strcmp( optarg, "125K")) return CAN_BAUD_125K;
+	if(!strcmp( optarg, "100K")) return CAN_BAUD_100K;
+	if(!strcmp( optarg, "50K")) return CAN_BAUD_50K;
+	if(!strcmp( optarg, "20K")) return CAN_BAUD_20K;
+	if(!strcmp( optarg, "10K")) return CAN_BAUD_10K;
+	if(!strcmp( optarg, "5K")) return CAN_BAUD_5K;
+	if(!strcmp( optarg, "none")) return 0;
+	return 0x0000;
+}
+
+/***************************************************************************/
+CAN_HANDLE _canOpen(s_BOARD *board)
 {
   HANDLE fd0 = NULL;
   char busname[64];
   char* pEnd;
   int i;  
+  int baudrate;
   
-  for(i=0; i < MAX_NB_CAN_PORTS; i++)
-  {
-  	if(!canports[i].used)
-	  	break;
-  }
-
   if(strtol(board->busname, &pEnd,0) >= 0)
   {
     sprintf(busname,"/dev/pcan%s",board->busname);
     fd0 = LINUX_CAN_Open(busname, O_RDWR);
   }
 
-  if (i==MAX_NB_CAN_PORTS || fd0 == NULL)
-    {
-      fprintf (stderr, "Open failed.\n");
-      return (CAN_HANDLE)NULL;
-    }
+  if(baudrate = TranslateBaudeRate(board->baudrate))
+   	CAN_Init(fd0, baudrate, CAN_INIT_TYPE_ST);
 
-   CAN_Init(fd0, board->baudrate, CAN_INIT_TYPE_ST);
-
-   canports[i].used = 1;
-   canports[i].fd = fd0;
-
-   canports[i].d = board->d;
-   CreateReceiveTask((CANPort*) &canports[i], &canports[i].receiveTask);
-
-   return (CANPort*) &canports[i];
+   return (CAN_HANDLE)fd0;
 }
 
 /***************************************************************************/
-int canClose(CAN_HANDLE fd0)
+int _canClose(CAN_HANDLE fd0)
 {
-  CAN_Close(((CANPort*)fd0)->fd);
-  WaitReceiveTaskEnd(&((CANPort*)fd0)->receiveTask);
-  ((CANPort*)fd0)->used = 0;
+  CAN_Close(fd0);
   return 0;
 }

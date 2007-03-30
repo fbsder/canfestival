@@ -69,47 +69,11 @@ UNS32 OnMasterMap1Update(CO_Data* d, const indextable * unsused_indextable, UNS8
 	return 0;
 }
 
-CAN_HANDLE SlaveCanHandle;
-CAN_HANDLE MasterCanHandle;
+CAN_PORT SlaveCanHandle;
+CAN_PORT MasterCanHandle;
 
-// Baudrate values for Peak board :
-// CAN_BAUD_1M CAN_BAUD_500K CAN_BAUD_250K CAN_BAUD_125K CAN_BAUD_100K CAN_BAUD_50K
-// CAN_BAUD_20K CAN_BAUD_10K CAN_BAUD_5K
-
-#ifdef CAN_BAUD_500K
-int TranslateBaudeRate(char* optarg){
-	if(!strcmp( optarg, "1M")) return CAN_BAUD_1M;
-	if(!strcmp( optarg, "500K")) return CAN_BAUD_500K;
-	if(!strcmp( optarg, "250K")) return CAN_BAUD_250K;
-	if(!strcmp( optarg, "125K")) return CAN_BAUD_125K;
-	if(!strcmp( optarg, "100K")) return CAN_BAUD_100K;
-	if(!strcmp( optarg, "50K")) return CAN_BAUD_50K;
-	if(!strcmp( optarg, "20K")) return CAN_BAUD_20K;
-	if(!strcmp( optarg, "10K")) return CAN_BAUD_10K;
-	if(!strcmp( optarg, "5K")) return CAN_BAUD_5K;
-	if(!strcmp( optarg, "none")) return 0;
-	return 0x0000;
-}
-s_BOARD SlaveBoard = {"0", CAN_BAUD_500K, &TestSlave_Data};
-s_BOARD MasterBoard = {"1", CAN_BAUD_500K, &TestMaster_Data};
-#else
-int TranslateBaudeRate(char* optarg){
-	if(!strcmp( optarg, "1M")) return 1000;
-	if(!strcmp( optarg, "500K")) return 500;
-	if(!strcmp( optarg, "250K")) return 250;
-	if(!strcmp( optarg, "125K")) return 125;
-	if(!strcmp( optarg, "100K")) return 100;
-	if(!strcmp( optarg, "50K")) return 50;
-	if(!strcmp( optarg, "20K")) return 20;
-	if(!strcmp( optarg, "10K")) return 10;
-	if(!strcmp( optarg, "5K")) return 5;
-	if(!strcmp( optarg, "none")) return 0;
-	return 0;
-}
-s_BOARD SlaveBoard = {"0", 500, &TestSlave_Data};
-s_BOARD MasterBoard = {"1", 500, &TestMaster_Data};
-#endif
-
+s_BOARD SlaveBoard = {"0", "500K"};
+s_BOARD MasterBoard = {"1", "500K"};
 
 void catch_signal(int sig)
 {
@@ -181,8 +145,9 @@ int main(int argc,char **argv)
 
   char c;
   extern char *optarg;
+  char* LibraryPath="../../drivers/can_virtual/libcanfestival_can_virtual.so";
 
-  while ((c = getopt(argc, argv, "-m:s:M:S:")) != EOF)
+  while ((c = getopt(argc, argv, "-m:s:M:S:l:")) != EOF)
   {
     switch(c)
     {
@@ -208,7 +173,7 @@ int main(int argc,char **argv)
           help();
           exit(1);
         }
-        SlaveBoard.baudrate = TranslateBaudeRate(optarg);
+        SlaveBoard.baudrate = optarg;
         break;
       case 'M' :
         if (optarg[0] == 0)
@@ -216,7 +181,15 @@ int main(int argc,char **argv)
           help();
           exit(1);
         }
-        MasterBoard.baudrate = TranslateBaudeRate(optarg);
+        MasterBoard.baudrate = optarg;
+        break;
+      case 'l' :
+        if (optarg[0] == 0)
+        {
+          help();
+          exit(1);
+        }
+        LibraryPath = optarg;
         break;
       default:
         help();
@@ -227,13 +200,26 @@ int main(int argc,char **argv)
 	/* install signal handler for manual break */
 	signal(SIGTERM, catch_signal);
 	signal(SIGINT, catch_signal);
-	
-	// Open CAN devices
-	if(SlaveBoard.baudrate)
-		if((SlaveCanHandle = canOpen(&SlaveBoard))==NULL) goto fail_slave;
 
-	if(MasterBoard.baudrate)
-		if((MasterCanHandle = canOpen(&MasterBoard))==NULL) goto fail_master;
+#ifndef NOT_USE_DYNAMIC_LOADING
+	LoadCanDriver(LibraryPath);
+#endif		
+	// Open CAN devices
+	if(SlaveBoard.baudrate){
+		SlaveCanHandle = canOpen(&SlaveBoard,&TestSlave_Data);
+		if(SlaveCanHandle == NULL){
+			eprintf("Cannot open Slave Board (%s,%d)\n",SlaveBoard.busname, SlaveBoard.baudrate);
+			goto fail_slave;
+		}
+	}
+
+	if(MasterBoard.baudrate){
+		MasterCanHandle = canOpen(&MasterBoard,&TestMaster_Data);
+		if(MasterCanHandle == NULL){
+			eprintf("Cannot open Master Board (%s,%d)\n",SlaveBoard.busname, SlaveBoard.baudrate);
+			goto fail_master;
+		}
+	}
 	
 	// Start timer thread
 	StartTimerLoop(&InitNodes);

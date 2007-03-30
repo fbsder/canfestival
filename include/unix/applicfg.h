@@ -23,11 +23,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __APPLICFG_LINUX__
 #define __APPLICFG_LINUX__
 
+
 #include <string.h>
 #include <stdio.h>
-
-#include "cancfg.h"
-#include "timerscfg.h"
 
 /*  Define the architecture : little_endian or big_endian
  -----------------------------------------------------
@@ -95,5 +93,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #else
 #    define MSG_WAR(num, str, val)
 #endif
+
+typedef void* CAN_HANDLE;
+
+typedef void* CAN_PORT;
 
 #endif

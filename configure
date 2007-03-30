@@ -74,8 +74,6 @@ CC2=cc
 # Install prefix
 SUB_PREFIX=
 
-SUB_TIMERS_ENABLE=YES
-
 # Used for C compiler test/detection 
 CFLAGS=
 test=conftest
@@ -101,14 +99,14 @@ while [ $# -ge 1 ]; do
 	--timers=*)	SUB_TIMERS_DRIVER=$optarg;;
 	--disable-Ox)	DISABLE_OPT=1;
 			echo "On user request: Won't optimize with \"-Ox\"";;
+	--disable-dll)	DISABLE_DLL=1;
+			echo "On user request: Won't create and link to dll";;
 	--debug)	DEBUG=1;
 			echo "Debug messages enabled !!";;
 	--debugPDO)	DEBUG=PDO;
 			echo "Debug messages (PDO) enabled !!";;
 	--enable-lss)	SUB_LSS_ENABLE=YES;
 			echo "On user request: Will enable Auto Baudrate detect Feature";;
-	--desable-timers)	SUB_TIMERS_ENABLE=NO;
-			echo "On user request: Will enable built-in timer dispatch Feature";;
 	--MAX_CAN_BUS_ID=*)	MAX_CAN_BUS_ID=$1;;
 	--SDO_MAX_LENGTH_TRANSFERT=*)	SDO_MAX_LENGTH_TRANSFERT=$1;;
 	--SDO_MAX_SIMULTANEOUS_TRANSFERTS=*)	SDO_MAX_SIMULTANEOUS_TRANSFERTS=$1;;
@@ -141,6 +139,7 @@ while [ $# -ge 1 ]; do
 		echo 	" --timers=foo  Use 'foo' as TIMERS driver (can be either 'unix' or 'xeno')"
 		echo	" --led=foo     Use 'foo' as DS-305 LED driver (use 'none' to disable or 'stdout')"
 		echo	" --nvram=foo   Use 'foo' as NVRAM driver (use 'none' to disable or 'file')"
+		echo 	" --disable-dll Disable run-time dynamic linking of can, led and nvram drivers"
 		echo	" --disable-Ox  Disable gcc \"-Ox\" optimizations."
 		echo	" --debug       Enable debug messages."
 		echo	" --debugPDO    Enable debug messages, using PDO."
@@ -233,11 +232,6 @@ fi
 if [ "$A_NAME" = "sparc64" ]; then
 	SUB_ARCH_NAME=sparc64
 fi
-
-
-#
-# The following has not been verified
-#
 
 # ppc
 if [ "$A_NAME" = "powerpc" ]; then
@@ -679,6 +673,14 @@ else
 	SUB_OPT_CFLAGS=\$\(OPT_CFLAGS\)
 fi
 
+if [ "$DISABLE_DLL" = "1" ]; then
+	SUB_PROG_CFLAGS=$SUB_PROG_CFLAGS\ -DNOT_USE_DYNAMIC_LOADING
+	SUB_ENABLE_DLL_DRIVERS=0
+else
+	SUB_ENABLE_DLL_DRIVERS=1
+	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -ldl
+fi
+
 ###########################################################################
 #                              CREATE MAKEFILES                           #
 ###########################################################################
@@ -748,11 +750,11 @@ for makefile_in in $MAKEFILES; do
 	s:SUB_LSS_ENABLE:${SUB_LSS_ENABLE}:
 	s:SUB_LED_ENABLE:${SUB_LED_ENABLE}:
 	s:SUB_NVRAM_ENABLE:${SUB_NVRAM_ENABLE}:
-	s:SUB_TIMERS_ENABLE:${SUB_TIMERS_ENABLE}:
 	s:SUB_TIMERS_DRIVER:timers_${SUB_TIMERS_DRIVER}:
 	s:SUB_CAN_DRIVER:can_${SUB_CAN_DRIVER}:
 	s:SUB_LED_DRIVER:led_${SUB_LED_DRIVER}:
 	s:SUB_NVRAM_DRIVER:nvram_${SUB_NVRAM_DRIVER}:
+	s:SUB_ENABLE_DLL_DRIVERS:${SUB_ENABLE_DLL_DRIVERS}:
 	" > $makefile
 done
 

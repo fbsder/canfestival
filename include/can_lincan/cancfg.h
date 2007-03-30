@@ -24,8 +24,5 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define __CANCFG_H__
 
 #define HANDLE		int
-#ifndef CAN_HANDLE
-#define CAN_HANDLE	void*
-#endif /*CAN_HANDLE*/
 
 #endif
