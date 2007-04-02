@@ -42,10 +42,6 @@ else
 DRIVER = $(OBJS)
 endif
 
-SRC_HFILES = ../../include/$(CAN_DRIVER)/cancfg.h
-
-TARGET_HFILES = $(PREFIX)/include/canfestival/cancfg.h
-
 TARGET_SOFILES = $(PREFIX)/lib/$(DRIVER)
 
 all: driver
@@ -59,9 +55,8 @@ libcanfestival_$(CAN_DRIVER).so: $(OBJS)
 	gcc -shared -Wl,-soname,libcanfestival_$(CAN_DRIVER).so -o $@ $<
 
 install: libcanfestival_$(CAN_DRIVER).so
-	mkdir -p $(PREFIX)/include/canfestival
-	cp $(SRC_HFILES) $(PREFIX)/include/canfestival
 	mkdir -p $(PREFIX)/lib/
+	cp $@ $(PREFIX)/lib/
 	
 uninstall:
 	rm -f $(TARGET_HFILES)

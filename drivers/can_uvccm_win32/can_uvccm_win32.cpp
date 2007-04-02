@@ -10,9 +10,8 @@
 #else
 #include <algorithm>
 #endif
-#include "applicfg.h"
-#include "can_driver.h"
 
+#include "can_driver.h"
 
 class can_uvccm_win32
    {
@@ -42,7 +41,7 @@ can_uvccm_win32::can_uvccm_win32(s_BOARD *board) : m_port(INVALID_HANDLE_VALUE),
       m_write_event(0),
       m_d(board->d)
    {
-   if (board->baudrate != 125000 || !open_rs232(1))
+   if (strcmp( board->baudrate, "125K") || !open_rs232(1))
       throw error();
    }
 
@@ -298,33 +297,36 @@ bool can_uvccm_win32::set_can_data(const Message& m, std::string& can_cmd)
 
 //------------------------------------------------------------------------
 extern "C"
-   UNS8 canReceive_driver(void* inst, Message *m)
+   UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
    {
    return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->receive(m);
    }
 
 extern "C"
-   UNS8 canSend_driver(void* inst, const Message *m)
+   UNS8 _canSend(CAN_HANDLE inst, const Message *m)
    {
    return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->send(m);
    }
 
 extern "C"
-   void* canOpen_driver(s_BOARD *board)
+   void* _canOpen(s_BOARD *board)
    {
    try
       {
-      return new can_uvccm_win32(board);
+      return (CAN_HANDLE) new can_uvccm_win32(board);
       }
    catch (can_uvccm_win32::error&)
       {
-      return 0;
+      return NULL;
       }
    }
 
 extern "C"
-   int canClose_driver(void* inst)
+   int _canClose(CAN_HANDLE inst)
    {
    delete reinterpret_cast<can_uvccm_win32*>(inst);
    return 1;
    }
+
+
+   

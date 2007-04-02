@@ -129,7 +129,7 @@ while [ $# -ge 1 ]; do
 		echo 	" --can=foo	Use 'foo' as CAN driver"
 		echo	"               \"peak_linux\" use Linux build host installed Peak driver and library"
 		echo	"                                please see http://www.peak-system.com/linux/"
-		echo	"               \"peak_cygwin\" use win32 PcanLight Peak driver and library with Cygwin" 
+		echo	"               \"peak_win32\" use win32 PcanLight Peak driver and library with Cygwin" 
 		echo	"                                please see http://www.peak-system.com/themen/download_gb.html"
 		echo	"               \"virtual\" use unix pipe based virtual can driver"
 		echo	"               \"socket\" use socket-can  "
@@ -349,7 +349,7 @@ if [ "$SUB_CAN_DRIVER" = "" ]; then
 			SUB_CAN_DRIVER=peak_linux
 		elif [ "$SUB_OS_NAME" = "CYGWIN" -a "PCAN_LIB" != "" ]; then
 			echo "Choosing installed Peak driver as CAN driver."
-			SUB_CAN_DRIVER=peak_cygwin		
+			SUB_CAN_DRIVER=peak_win32		
 		else
 			echo "Choosing virtual CAN driver."
 			SUB_CAN_DRIVER=virtual
@@ -446,29 +446,30 @@ if [ "$SUB_CAN_DRIVER" = "peak" ]; then
     SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -lpcan
 fi
 
-if [ "$SUB_CAN_DRIVER" = "peak_cygwin" ]; then
+PW32DIR=drivers/can_peak_win32
+if [ "$SUB_CAN_DRIVER" = "peak_win32" ]; then
 	if [ "$PCAN_HEADER" = "" -o "PCAN_LIB" = "" ]; then
 		echo "!!! ERROR !!! Please set PCAN_LIB PCAN_HEADER [PCAN_INCLUDE] to appropriate paths ! "
 	fi
    	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -liberty\ \'$PCAN_LIB\'
-	echo "Converting PcanLib header files for gcc -> /drivers/can_peak_cygwin/cancfg.h"
-	cat include/can_peak_cygwin/cancfg.h.head $PCAN_INCLUDE/$PCAN_HEADER > include/can_peak_cygwin/cancfg.h
+	echo "Converting PcanLib header files for gcc -> $PW32DIR/cancfg.h"
+	cat $PW32DIR/cancfg.h.head $PCAN_INCLUDE/$PCAN_HEADER > $PW32DIR/cancfg.h
 	# second port handling
 	if [ "$PCAN2_HEADER" != "" ]; then
 		echo "Stripping down second Pcan Light header "
-		echo >> include/can_peak_cygwin/cancfg.h
-		echo "// Stripped PcanLight header to prevent typedef conflicts ">> include/can_peak_cygwin/cancfg.h
-		echo >> include/can_peak_cygwin/cancfg.h
-		grep __stdcall $PCAN_INCLUDE/$PCAN2_HEADER >> include/can_peak_cygwin/cancfg.h
+		echo >> $PW32DIR/cancfg.h
+		echo "// Stripped PcanLight header to prevent typedef conflicts ">> $PW32DIR/cancfg.h
+		echo >> $PW32DIR/cancfg.h
+		grep __stdcall $PCAN_INCLUDE/$PCAN2_HEADER >> $PW32DIR/cancfg.h
 	   	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ \'$PCAN2_LIB\'
-		echo '#define PCAN2_HEADER_' >> include/can_peak_cygwin/cancfg.h
+		echo '#define PCAN2_HEADER_' >> $PW32DIR/cancfg.h
 	fi
-	if grep -q CANHwType include/can_peak_cygwin/cancfg.h ; then
+	if grep -q CANHwType $PW32DIR/cancfg.h ; then
 		echo "Peak Init HwType, IO_Port and IRQ will be passed in environment :"
 		echo "	PCANHwType PCANIO_Port PCANInterupt"
-		echo '#define extra_PCAN_init_params' >> include/can_peak_cygwin/cancfg.h
+		echo '#define extra_PCAN_init_params' >> $PW32DIR/cancfg.h
 	fi
-	cat include/can_peak_cygwin/cancfg.h.tail >> include/can_peak_cygwin/cancfg.h
+	cat $PW32DIR/cancfg.h.tail >> $PW32DIR/cancfg.h
 fi
 
 if [ "$SUB_CAN_DRIVER" = "none" ]; then

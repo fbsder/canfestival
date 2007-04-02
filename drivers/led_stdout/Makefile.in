@@ -25,18 +25,18 @@ CC = SUB_CC
 OPT_CFLAGS = -O2
 CFLAGS = SUB_OPT_CFLAGS
 PROG_CFLAGS = SUB_PROG_CFLAGS
+OS_NAME = SUB_OS_NAME
+ARCH_NAME = SUB_ARCH_NAME
 PREFIX = SUB_PREFIX
 TARGET = SUB_TARGET
-CAN_DRIVER = SUB_CAN_DRIVER
 TIMERS_DRIVER = SUB_TIMERS_DRIVER
+CAN_DRIVER = SUB_CAN_DRIVER
+LED_DRIVER = SUB_LED_DRIVER
+NVRAM_DRIVER = SUB_NVRAM_DRIVER
 
 INCLUDES = -I../../include -I../../include/$(TARGET) -I../../include/$(CAN_DRIVER) -I../../include/$(TIMERS_DRIVER)
 
-OBJS = $(CAN_DRIVER).o
-
-SRC_HFILES = ../../include/$(CAN_DRIVER)/cancfg.h
-
-TARGET_HFILES = $(PREFIX)/include/canfestival/cancfg.h
+OBJS = $(LED_DRIVER).o
 
 all: driver
 
@@ -46,13 +46,12 @@ driver: $(OBJS)
 	$(CC) $(CFLAGS) $(PROG_CFLAGS) ${PROGDEFINES} $(INCLUDES) -o $@ -c $<
 
 install:
-	mkdir -p $(PREFIX)/include/canfestival
-	cp $(SRC_HFILES) $(PREFIX)/include/canfestival
 
 uninstall:
-	rm -f $(TARGET_HFILES)
 
 clean:
 	rm -f $(OBJS)
 
 mrproper: clean
+
+

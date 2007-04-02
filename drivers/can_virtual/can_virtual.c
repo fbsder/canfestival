@@ -24,11 +24,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	Virtual CAN driver.
 */
 
-#include <stdlib.h>
-
-#include <sys/types.h>
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "can_driver.h"
 
