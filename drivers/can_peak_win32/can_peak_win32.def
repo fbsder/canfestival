@@ -1,7 +1,7 @@
 LIBRARY	can_peak_win32
 	
 EXPORTS
-    _canClose
-    _canOpen
-    _canReceive
-    _canSend
+   canReceive_driver
+   canSend_driver
+   canOpen_driver
+   canClose_driver
