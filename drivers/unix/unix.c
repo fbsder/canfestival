@@ -24,21 +24,21 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 
 #ifndef NOT_USE_DYNAMIC_LOADING
-#define DLL_CALL(funcname) (*_##funcname)
+#define DLL_CALL(funcname) (* funcname##_driver)
 #define FCT_PTR_INIT =NULL
 
 #ifdef WIN32
 #define DLSYM(name)\
-    *(void **) (&_##name) = GetProcAddress(handle, TEXT("_"#name));\
-	if (_##name == NULL)  {\
-		fprintf (stderr, "Error loading symbol %s\n","_"#name);\
+    *(void **) (&_##name) = GetProcAddress(handle, TEXT(#name"_driver"));\
+	if (name##_driver == NULL)  {\
+		fprintf (stderr, "Error loading symbol %s\n",#name"_driver");\
 		UnLoadCanDriver(handle);\
 		return NULL;\
 	}
  
 #else
 #define DLSYM(name)\
-	*(void **) (&_##name) = dlsym(handle, "_"#name);\
+	*(void **) (&name##_driver) = dlsym(handle, #name"_driver");\
 	if ((error = dlerror()) != NULL)  {\
 		fprintf (stderr, "%s\n", error);\
 		UnLoadCanDriver(handle);\
@@ -49,7 +49,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #else /*NOT_USE_DYNAMIC_LOADING*/
 
 /*Function call is direct*/
-#define DLL_CALL(funcname) _##funcname
+#define DLL_CALL(funcname) funcname##_driver
 
 #endif /*NOT_USE_DYNAMIC_LOADING*/
 

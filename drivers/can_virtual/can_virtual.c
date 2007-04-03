@@ -39,7 +39,7 @@ typedef struct {
 CANPipe canpipes[MAX_NB_CAN_PIPES] = {{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},{0,},};
 
 /*********functions which permit to communicate with the board****************/
-UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 canReceive_driver(CAN_HANDLE fd0, Message *m)
 {
 	if(read(((CANPipe*)fd0)->pipe[0], m, sizeof(Message)) < sizeof(Message))
 	{
@@ -49,7 +49,7 @@ UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
 }
 
 /***************************************************************************/
-UNS8 _canSend(CAN_HANDLE fd0, Message *m)
+UNS8 canSend_driver(CAN_HANDLE fd0, Message *m)
 {
   int i;
   // Send to all readers, except myself
@@ -77,7 +77,7 @@ int TranslateBaudeRate(char* optarg){
 	return 0;
 }*/
 /***************************************************************************/
-CAN_HANDLE _canOpen(s_BOARD *board)
+CAN_HANDLE canOpen_driver(s_BOARD *board)
 {
   int i;  
   for(i=0; i < MAX_NB_CAN_PIPES; i++)
@@ -98,7 +98,7 @@ CAN_HANDLE _canOpen(s_BOARD *board)
 }
 
 /***************************************************************************/
-int _canClose(CAN_HANDLE fd0)
+int canClose_driver(CAN_HANDLE fd0)
 {
   close(((CANPipe*)fd0)->pipe[0]);
   close(((CANPipe*)fd0)->pipe[1]);

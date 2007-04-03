@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "can_driver.h"
 
 /*********functions which permit to communicate with the board****************/
-UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 canReceive_driver(CAN_HANDLE fd0, Message *m)
 {
   int res;
   struct canmsg_t canmsg;
@@ -63,7 +63,7 @@ UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
 }
 
 /***************************************************************************/
-UNS8 _canSend(CAN_HANDLE fd0, Message *m)
+UNS8 canSend_driver(CAN_HANDLE fd0, Message *m)
 {
   int res;
   struct canmsg_t canmsg;
@@ -92,7 +92,7 @@ UNS8 _canSend(CAN_HANDLE fd0, Message *m)
 /***************************************************************************/
 static const char lnx_can_dev_prefix[] = "/dev/can";
 
-CAN_HANDLE _canOpen(s_BOARD *board)
+CAN_HANDLE canOpen_driver(s_BOARD *board)
 {
   int name_len = strlen(board->busname);
   int prefix_len = strlen(lnx_can_dev_prefix);
@@ -124,7 +124,7 @@ CAN_HANDLE _canOpen(s_BOARD *board)
 }
 
 /***************************************************************************/
-int _canClose(CAN_HANDLE fd0)
+int canClose_driver(CAN_HANDLE fd0)
 {
   if(!fd0)
     return 0;

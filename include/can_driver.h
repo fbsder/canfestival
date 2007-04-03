@@ -36,7 +36,7 @@ struct struct_s_BOARD {
 };
 
 #ifndef DLL_CALL
-#define DLL_CALL(funcname) _##funcname
+#define DLL_CALL(funcname) funcname##_driver
 #endif
 
 #ifndef FCT_PTR_INIT

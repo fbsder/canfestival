@@ -37,7 +37,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define CAN_INIT_TYPE_ST_RTR MSGTYPE_STANDARD | MSGTYPE_RTR 
 
 /*********functions which permit to communicate with the board****************/
-UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 canReceive_driver(CAN_HANDLE fd0, Message *m)
 {
   UNS8 data; 
   TPCANMsg peakMsg;
@@ -61,7 +61,7 @@ UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
 }
 
 /***************************************************************************/
-UNS8 _canSend(CAN_HANDLE fd0, Message *m)
+UNS8 canSend_driver(CAN_HANDLE fd0, Message *m)
 {
   UNS8 data;
   TPCANMsg peakMsg;
@@ -101,7 +101,7 @@ int TranslateBaudeRate(char* optarg){
 }
 
 /***************************************************************************/
-CAN_HANDLE _canOpen(s_BOARD *board)
+CAN_HANDLE canOpen_driver(s_BOARD *board)
 {
   HANDLE fd0 = NULL;
   char busname[64];
@@ -122,7 +122,7 @@ CAN_HANDLE _canOpen(s_BOARD *board)
 }
 
 /***************************************************************************/
-int _canClose(CAN_HANDLE fd0)
+int canClose_driver(CAN_HANDLE fd0)
 {
   CAN_Close(fd0);
   return 0;

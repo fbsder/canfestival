@@ -50,7 +50,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "can_driver.h"
 
 /*********functions which permit to communicate with the board****************/
-UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 canReceive_driver(CAN_HANDLE fd0, Message *m)
 {
        int res;
        struct can_frame frame;
@@ -72,7 +72,7 @@ UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
 
 
 /***************************************************************************/
-UNS8 _canSend(CAN_HANDLE fd0, Message *m)
+UNS8 canSend_driver(CAN_HANDLE fd0, Message *m)
 {
        int res;
        struct can_frame frame;
@@ -94,7 +94,7 @@ UNS8 _canSend(CAN_HANDLE fd0, Message *m)
 }
 
 /***************************************************************************/
-CAN_HANDLE _canOpen(s_BOARD *board)
+CAN_HANDLE canOpen_driver(s_BOARD *board)
 {
        CAN_HANDLE fd0;
        struct ifreq ifr;
@@ -133,7 +133,7 @@ CAN_HANDLE _canOpen(s_BOARD *board)
 }
 
 /***************************************************************************/
-int canClose(CAN_HANDLE fd0)
+int canClose_driver(CAN_HANDLE fd0)
 {
        if (fd0) {
                CAN_CLOSE(fd0);

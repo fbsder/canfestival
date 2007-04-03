@@ -86,7 +86,7 @@ canInit (s_BOARD *board)
 
 /*********functions which permit to communicate with the board****************/
 UNS8
-_canReceive (CAN_HANDLE fd0, Message * m)
+canReceive_driver (CAN_HANDLE fd0, Message * m)
 {
 	UNS8 data;
 	TPCANMsg peakMsg;
@@ -156,7 +156,7 @@ _canReceive (CAN_HANDLE fd0, Message * m)
 
 /***************************************************************************/
 UNS8
-_canSend (CAN_HANDLE fd0, Message * m)
+canSend_driver (CAN_HANDLE fd0, Message * m)
 {
 	UNS8 data;
 	TPCANMsg peakMsg;
@@ -202,7 +202,7 @@ fail:
 
 /***************************************************************************/
 CAN_HANDLE
-_canOpen (s_BOARD * board)
+canOpen_driver (s_BOARD * board)
 {
 #ifdef PCAN2_HEADER_
 	if(first_board != NULL && second_board != NULL)
@@ -234,7 +234,7 @@ _canOpen (s_BOARD * board)
 
 /***************************************************************************/
 int
-_canClose (CAN_HANDLE fd0)
+canClose_driver (CAN_HANDLE fd0)
 {
 #ifdef PCAN2_HEADER_
 	// if not the first handler
@@ -251,4 +251,3 @@ _canClose (CAN_HANDLE fd0)
 	}
 	return 0;
 }
-
