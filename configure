@@ -440,10 +440,7 @@ fi
 #### CAN_DRIVER ####
 
 if [ "$SUB_CAN_DRIVER" = "peak" ]; then
-    if [ "$SUB_TIMERS_DRIVER" = "xeno" ]; then
-    	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -lrtdm
-    fi
-    SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -lpcan
+    SUB_CAN_DLL_CFLAGS=$SUB_CAN_DLL_CFLAGS\ -lpcan
 fi
 
 PW32DIR=drivers/can_peak_win32
@@ -451,7 +448,7 @@ if [ "$SUB_CAN_DRIVER" = "peak_win32" ]; then
 	if [ "$PCAN_HEADER" = "" -o "PCAN_LIB" = "" ]; then
 		echo "!!! ERROR !!! Please set PCAN_LIB PCAN_HEADER [PCAN_INCLUDE] to appropriate paths ! "
 	fi
-   	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -liberty\ \'$PCAN_LIB\'
+   	SUB_CAN_DLL_CFLAGS=$SUB_CAN_DLL_CFLAGS\ -liberty\ \'$PCAN_LIB\'
 	echo "Converting PcanLib header files for gcc -> $PW32DIR/cancfg.h"
 	cat $PW32DIR/cancfg.h.head $PCAN_INCLUDE/$PCAN_HEADER > $PW32DIR/cancfg.h
 	# second port handling
@@ -461,8 +458,8 @@ if [ "$SUB_CAN_DRIVER" = "peak_win32" ]; then
 		echo "// Stripped PcanLight header to prevent typedef conflicts ">> $PW32DIR/cancfg.h
 		echo >> $PW32DIR/cancfg.h
 		grep __stdcall $PCAN_INCLUDE/$PCAN2_HEADER >> $PW32DIR/cancfg.h
-	   	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ \'$PCAN2_LIB\'
 		echo '#define PCAN2_HEADER_' >> $PW32DIR/cancfg.h
+	   	SUB_CAN_DLL_CFLAGS=$SUB_CAN_DLL_CFLAGS\ \'$PCAN2_LIB\'
 	fi
 	if grep -q CANHwType $PW32DIR/cancfg.h ; then
 		echo "Peak Init HwType, IO_Port and IRQ will be passed in environment :"
@@ -682,6 +679,11 @@ else
 	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ -ldl
 fi
 
+
+if [ "$DISABLE_DLL" = "1" ]; then
+	SUB_EXE_CFLAGS=$SUB_EXE_CFLAGS\ $SUB_CAN_DLL_CFLAGS
+fi
+
 ###########################################################################
 #                              CREATE MAKEFILES                           #
 ###########################################################################
@@ -753,6 +755,7 @@ for makefile_in in $MAKEFILES; do
 	s:SUB_NVRAM_ENABLE:${SUB_NVRAM_ENABLE}:
 	s:SUB_TIMERS_DRIVER:timers_${SUB_TIMERS_DRIVER}:
 	s:SUB_CAN_DRIVER:can_${SUB_CAN_DRIVER}:
+	s:SUB_CAN_DLL_CFLAGS:${SUB_CAN_DLL_CFLAGS}:
 	s:SUB_LED_DRIVER:led_${SUB_LED_DRIVER}:
 	s:SUB_NVRAM_DRIVER:nvram_${SUB_NVRAM_DRIVER}:
 	s:SUB_ENABLE_DLL_DRIVERS:${SUB_ENABLE_DLL_DRIVERS}:

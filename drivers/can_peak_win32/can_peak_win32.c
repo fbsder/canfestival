@@ -29,9 +29,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //#include "libpcan.h"
 //#include "pcan.h"
 
+#include "cancfg.h"
 #include "can_driver.h"
 
-#if defined(WIN32)
+#if defined(WIN32) && !defined(__CYGWIN__)
 #define usleep(micro) Sleep(micro%1000 ? (micro/1000) + 1 : (micro/1000))
 #endif
 
@@ -46,10 +47,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 static s_BOARD *first_board = NULL;
 #ifdef PCAN2_HEADER_
-#define MAX_NB_CAN_PORTS 2
 static s_BOARD *second_board = NULL;
-#else
-#define MAX_NB_CAN_PORTS 1
 #endif
 
 //pthread_mutex_t PeakCan_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -83,8 +81,8 @@ canInit (s_BOARD *board)
 		if(baudrate = TranslateBaudeRate(board->baudrate))
 			CAN2_Init (baudrate,
 			  CAN_INIT_TYPE_ST extra_PCAN_init_params);
-	else
 #endif
+	if(first_board == (s_BOARD *)board)
 		if(baudrate = TranslateBaudeRate(board->baudrate))
 			CAN_Init (baudrate,
 			  CAN_INIT_TYPE_ST extra_PCAN_init_params);
@@ -98,7 +96,6 @@ _canReceive (CAN_HANDLE fd0, Message * m)
 	TPCANMsg peakMsg;
 
 	DWORD Res;
-	int tryagain;
 
 	do{
 		// We read the queue looking for messages.
@@ -110,7 +107,10 @@ _canReceive (CAN_HANDLE fd0, Message * m)
 			Res = CAN2_Read (&peakMsg);
 		else
 #endif
+		if(first_board == (s_BOARD *)fd0)
 			Res = CAN_Read (&peakMsg);
+		else
+			Res = CAN_ERR_BUSOFF;
 	
 		// A message was received
 		// We process the message(s)
@@ -154,7 +154,7 @@ _canReceive (CAN_HANDLE fd0, Message * m)
 			}
 			usleep (1000);		
 		}
-	}while(Res != CAN_ERR_OK)
+	}while(Res != CAN_ERR_OK);
 	return 0;
 }
 
@@ -214,7 +214,7 @@ _canOpen (s_BOARD * board)
 	int i;
 
 #ifdef PCAN2_HEADER_
-	if(second_board != NULL)
+	if(first_board != NULL && second_board != NULL)
 #else
 	if(first_board != NULL)
 #endif
@@ -227,16 +227,16 @@ _canOpen (s_BOARD * board)
 		return NULL;
 	}
 
-	canInit(board);
-
 #ifdef PCAN2_HEADER_
-	if(first_board = NULL)
+	if(first_board == NULL)
 		first_board = board;
 	else
 		second_board = board; 
 #else
 	first_board = board;
 #endif
+
+	canInit(board);
 	
 	return (CAN_HANDLE)board;
 }
@@ -251,7 +251,7 @@ _canClose (CAN_HANDLE fd0)
 	{
 		CAN2_Close ();
 		second_board = (s_BOARD *)NULL;
-	}	
+	}else	
 #endif
 	if(first_board == (s_BOARD *)fd0)
 	{

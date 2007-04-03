@@ -208,7 +208,7 @@ int main(int argc,char **argv)
 	if(SlaveBoard.baudrate){
 		SlaveCanHandle = canOpen(&SlaveBoard,&TestSlave_Data);
 		if(SlaveCanHandle == NULL){
-			eprintf("Cannot open Slave Board (%s,%d)\n",SlaveBoard.busname, SlaveBoard.baudrate);
+			eprintf("Cannot open Slave Board (%s,%s)\n",SlaveBoard.busname, SlaveBoard.baudrate);
 			goto fail_slave;
 		}
 	}
@@ -216,7 +216,7 @@ int main(int argc,char **argv)
 	if(MasterBoard.baudrate){
 		MasterCanHandle = canOpen(&MasterBoard,&TestMaster_Data);
 		if(MasterCanHandle == NULL){
-			eprintf("Cannot open Master Board (%s,%d)\n",SlaveBoard.busname, SlaveBoard.baudrate);
+			eprintf("Cannot open Master Board (%s,%s)\n",SlaveBoard.busname, SlaveBoard.baudrate);
 			goto fail_master;
 		}
 	}

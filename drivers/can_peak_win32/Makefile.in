@@ -30,6 +30,7 @@ TARGET = SUB_TARGET
 CAN_DRIVER = SUB_CAN_DRIVER
 TIMERS_DRIVER = SUB_TIMERS_DRIVER
 ENABLE_DLL_DRIVERS=SUB_ENABLE_DLL_DRIVERS
+CAN_DLL_CFLAGS=SUB_CAN_DLL_CFLAGS
 
 INCLUDES = -I../../include -I../../include/$(TARGET) -I../../include/$(CAN_DRIVER)
 
@@ -37,7 +38,7 @@ OBJS = $(CAN_DRIVER).o
 
 ifeq ($(ENABLE_DLL_DRIVERS),1)
 CFLAGS += -fPIC
-DRIVER = libcanfestival_$(CAN_DRIVER).so
+DRIVER = cyg$(CAN_DRIVER).dll
 else
 DRIVER = $(OBJS)
 endif
@@ -51,9 +52,14 @@ driver: $(DRIVER)
 %o: %c
 	$(CC) $(CFLAGS) $(PROG_CFLAGS) ${PROGDEFINES} $(INCLUDES) -o $@ -c $<
 
-libcanfestival_$(CAN_DRIVER).so: $(OBJS)
-	gcc -shared -Wl,-soname,libcanfestival_$(CAN_DRIVER).so -o $@ $<
-
+cyg$(CAN_DRIVER).dll: $(OBJS)
+	gcc -shared -o $@ \
+	-Wl,--export-all-symbols \
+	-Wl,--enable-auto-import \
+	-Wl,--whole-archive $< \
+	-Wl,--no-whole-archive $(CAN_DLL_CFLAGS) \
+	-Wl,--exclude-libs,ALL
+		
 install: libcanfestival_$(CAN_DRIVER).so
 	mkdir -p $(PREFIX)/lib/
 	cp $@ $(PREFIX)/lib/
