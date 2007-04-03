@@ -164,11 +164,10 @@ LIB_HANDLE LoadCanDriver(char* driver_name)
 UNS8 canReceive(CAN_PORT fd0, Message *m)
    {
    if (fd0 != NULL && s_driver_procs.m_canReceive != NULL)
-      {
-      driver_data* data = (driver_data*)fd0;
-      if ((*s_driver_procs.m_canReceive)(data->inst, m))
-         return 0;
-      }
+	   {
+		  driver_data* data = (driver_data*)fd0;
+		  return (*s_driver_procs.m_canReceive)(data->inst, m);
+	   }
    return 1;
    }
 
@@ -186,6 +185,7 @@ void* canReceiveLoop(CAN_PORT fd0)
          }
       else
          {
+		 break;
          ::Sleep(1);
          }
       }

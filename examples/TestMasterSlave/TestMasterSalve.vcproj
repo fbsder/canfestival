@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="TestMasterSlave"
-	ProjectGUID="{BD8B1FE1-89CD-4F89-8275-0F553FA71059}"
+	ProjectGUID="{B51A176D-5320-4534-913B-3025CED5B27E}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -186,15 +186,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\TestMasterSlave.c"
-				>
-			</File>
-			<File
-				RelativePath=".\TestMaster.c"
-				>
-			</File>
-			<File
-				RelativePath=".\TestSlave.c"
+				RelativePath=".\getopt.c"
 				>
 			</File>
 			<File
@@ -206,7 +198,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\getopt.c"
+				RelativePath=".\TestMaster.c"
+				>
+			</File>
+			<File
+				RelativePath=".\TestMasterSlave.c"
+				>
+			</File>
+			<File
+				RelativePath=".\TestSlave.c"
 				>
 			</File>
 		</Filter>
@@ -216,15 +216,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\TestMasterSlave.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TestMaster.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TestSlave.h"
+				RelativePath=".\getopt.h"
 				>
 			</File>
 			<File
@@ -236,7 +228,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\getopt.h"
+				RelativePath=".\TestMaster.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TestMasterSlave.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TestSlave.h"
 				>
 			</File>
 		</Filter>

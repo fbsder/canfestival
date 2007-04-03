@@ -23,6 +23,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #if defined(WIN32) && !defined(__CYGWIN__)
 #include <windows.h>
 #include "getopt.h"
+void pause(void)
+{
+	system("PAUSE");
+}
 #else
 #include <stdio.h>
 #include <string.h>
@@ -80,12 +84,14 @@ CAN_PORT MasterCanHandle;
 s_BOARD SlaveBoard = {"0", "500K"};
 s_BOARD MasterBoard = {"1", "500K"};
 
+#if !defined(WIN32) || defined(__CYGWIN__)
 void catch_signal(int sig)
 {
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
   eprintf("Got Signal %d\n",sig);
 }
+#endif
 
 void help()
 {
@@ -204,9 +210,11 @@ int main(int argc,char **argv)
     }
   }
 
-	/* install signal handler for manual break */
+#if !defined(WIN32) || defined(__CYGWIN__)
+  /* install signal handler for manual break */
 	signal(SIGTERM, catch_signal);
 	signal(SIGINT, catch_signal);
+#endif
 
 #ifndef NOT_USE_DYNAMIC_LOADING
 	LoadCanDriver(LibraryPath);

@@ -298,7 +298,7 @@ bool can_uvccm_win32::set_can_data(const Message& m, std::string& can_cmd)
 extern "C"
    UNS8 canReceive_driver(CAN_HANDLE fd0, Message *m)
    {
-   return (UNS8)reinterpret_cast<can_uvccm_win32*>(fd0)->receive(m);
+   return (UNS8)(!(reinterpret_cast<can_uvccm_win32*>(fd0)->receive(m)));
    }
 
 extern "C"
