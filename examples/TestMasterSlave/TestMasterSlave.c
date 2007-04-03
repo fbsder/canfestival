@@ -20,12 +20,17 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#include <windows.h>
+#include "getopt.h"
+#else
 #include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
-#include <unistd.h>
+//#include <sys/time.h>
+//#include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#endif
 
 #include <applicfg.h>
 #include <can_driver.h>
@@ -96,6 +101,8 @@ void help()
   printf("*   ./TestMasterSlave  [OPTIONS]                             *\n");
   printf("*                                                            *\n");
   printf("*   OPTIONS:                                                 *\n");
+  printf("*     -l : Can library [\"libcanfestival_can_virtual.so\"]     *\n");
+  printf("*                                                            *\n");
   printf("*    Slave:                                                  *\n");
   printf("*     -s : bus name [\"0\"]                                    *\n");
   printf("*     -S : 1M,500K,250K,125K,100K,50K,20K,10K,none(disable)  *\n");
@@ -145,7 +152,7 @@ int main(int argc,char **argv)
 
   char c;
   extern char *optarg;
-  char* LibraryPath="../../drivers/can_virtual/libcanfestival_can_virtual.so";
+  char* LibraryPath="libcanfestival_can_virtual.so";
 
   while ((c = getopt(argc, argv, "-m:s:M:S:l:")) != EOF)
   {
