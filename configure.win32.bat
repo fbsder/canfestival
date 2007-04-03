@@ -7,8 +7,10 @@
 @ECHO ***********************************************
 
 
-COPY /Y include\applicfg.h.win32 include\applicfg.h
+@REM COPY /Y include\win32\applicfg.h.win32 include\applicfg.h
 
-COPY /Y include\config.h.win32 include\config.h
+@REM COPY /Y include\win32\config.h.win32 include\config.h
+
+@REM COPY /Y include\win32\canfestival.h.win32 include\canfestival.h
 
 @ECHO Done.

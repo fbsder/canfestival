@@ -27,7 +27,7 @@ struct struct_s_BOARD;
 
 typedef struct struct_s_BOARD s_BOARD;
 
-#include <applicfg.h>
+#include "applicfg.h"
 #include "can.h"
 
 struct struct_s_BOARD {

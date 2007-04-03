@@ -20,14 +20,20 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#ifndef CANFESTIVAL_H_
+#define CANFESTIVAL_H_
 
-#ifndef __APPLICFG__
-#define __APPLICFG__
+#include "timerscfg.h"
+#include "can_driver.h"
+#include "data.h"
 
-#if defined(WIN32) || defined(UNDER_CE)
-  #include "win32/applicfg.h"
-  #include "win32/timerscfg.h"
-#endif
+#include <windows.h>
+typedef HINSTANCE LIB_HANDLE;
 
+UNS8 UnLoadCanDriver(LIB_HANDLE handle);
+LIB_HANDLE LoadCanDriver(char* driver_name);
+UNS8 canSend(CAN_PORT port, Message *m);
+CAN_PORT canOpen(s_BOARD *board, CO_Data * d);
+int canClose(CAN_PORT port);
 
-#endif //__APPLICFG__
+#endif /*CANFESTIVAL_H_*/

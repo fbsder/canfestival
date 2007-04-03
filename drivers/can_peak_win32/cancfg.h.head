@@ -23,7 +23,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __CANCFG_H__
 #define __CANCFG_H__
 
+
+#if defined(__CYGWIN__)
 #include <windef.h>
+#else
+#include <windows.h>
+#endif
 
 // Following part of the file is copied by configure script
 // from choosen PcanLight header file

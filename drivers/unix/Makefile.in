@@ -61,9 +61,9 @@ ifneq ($(NVRAM_DRIVER),nvram_)
 OBJS += ../$(NVRAM_DRIVER)/$(NVRAM_DRIVER).o
 endif
 
-SRC_HFILES = ../../include/$(TARGET)/applicfg.h
+SRC_HFILES = ../../include/$(TARGET)/applicfg.h ../../include/$(TARGET)/canfestival.h
 
-TARGET_HFILES = $(PREFIX)/include/$(TARGET)/applicfg.h
+TARGET_HFILES = $(PREFIX)/include/$(TARGET)/applicfg.h $(PREFIX)/include/$(TARGET)/canfestival.h
 
 all: driver
 

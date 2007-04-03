@@ -54,7 +54,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif /*NOT_USE_DYNAMIC_LOADING*/
 
 #include "data.h"
-#include "unix.h"
+#include "canfestival.h"
 #include "timers_driver.h"
 
 #define MAX_NB_CAN_PORTS 16

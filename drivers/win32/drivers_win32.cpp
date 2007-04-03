@@ -29,9 +29,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 extern "C"
    {
-#include "applicfg.h"
+#define DLL_CALL(funcname) (*_##funcname)
+#define FCT_PTR_INIT =NULL
+#include "canfestival.h"
 #include "timer.h"
-#include "can_driver.h"
+
 #include "nvram_driver.h"
 #include "lss_driver.h"
 #include "timers_driver.h"
@@ -58,7 +60,7 @@ class driver_procs
       driver_procs();
       ~driver_procs();
 
-      bool load_canfestival_driver(LPCTSTR driver_name);
+      HMODULE load_canfestival_driver(LPCTSTR driver_name);
       bool can_driver_valid() const;
 
    public:
@@ -118,13 +120,13 @@ bool driver_procs::can_driver_valid() const
   #define myTEXT(str) str
 #endif
 
-bool driver_procs::load_canfestival_driver(LPCTSTR driver_name)
+HMODULE driver_procs::load_canfestival_driver(LPCTSTR driver_name)
    {
    if (can_driver_valid())
-      return TRUE;
+      return m_driver_handle;
    m_driver_handle = ::LoadLibrary(driver_name);
    if (m_driver_handle == NULL)
-      return false;
+      return NULL;
 
    m_canReceive = (CANRECEIVE_DRIVER_PROC)::GetProcAddress(m_driver_handle, myTEXT("canReceive_driver"));
    m_canSend = (CANSEND_DRIVER_PROC)::GetProcAddress(m_driver_handle, myTEXT("canSend_driver"));
@@ -141,7 +143,7 @@ bool driver_procs::load_canfestival_driver(LPCTSTR driver_name)
    m_baudrate_valid = (BAUDRATE_VALID_PROC)::GetProcAddress(m_driver_handle, myTEXT("baudrate_valid_driver"));
    m_baudrate_set = (BAUDRATE_SET_PROC)::GetProcAddress(m_driver_handle, myTEXT("baudrate_set_driver"));
 
-   return can_driver_valid();
+   return can_driver_valid()?m_driver_handle:NULL;
    }
 
 struct driver_data
@@ -154,14 +156,12 @@ struct driver_data
 
 driver_procs s_driver_procs;
 
-
-BOOL LoadCanDriver(LPCTSTR driver_name)
+LIB_HANDLE LoadCanDriver(char* driver_name)
    {
-   return s_driver_procs.load_canfestival_driver(driver_name) ? TRUE : FALSE;
+		return s_driver_procs.load_canfestival_driver((LPCTSTR)driver_name);
    }
 
-/*********functions which permit to communicate with the board****************/
-UNS8 canReceive(CAN_HANDLE fd0, Message *m)
+UNS8 canReceive(CAN_PORT fd0, Message *m)
    {
    if (fd0 != NULL && s_driver_procs.m_canReceive != NULL)
       {
@@ -172,7 +172,7 @@ UNS8 canReceive(CAN_HANDLE fd0, Message *m)
    return 1;
    }
 
-void canReceiveLoop(CAN_HANDLE fd0)
+void* canReceiveLoop(CAN_PORT fd0)
    {
    driver_data* data = (driver_data*)fd0;
    Message m;
@@ -189,10 +189,11 @@ void canReceiveLoop(CAN_HANDLE fd0)
          ::Sleep(1);
          }
       }
+   return 0;
    }
 
 /***************************************************************************/
-UNS8 canSend(CAN_HANDLE fd0, Message *m)
+UNS8 canSend(CAN_PORT fd0, Message *m)
    {
    if (fd0 != NULL && s_driver_procs.m_canSend != NULL)
       {
@@ -204,7 +205,7 @@ UNS8 canSend(CAN_HANDLE fd0, Message *m)
    }
 
 /***************************************************************************/
-CAN_HANDLE canOpen(s_BOARD *board)
+CAN_HANDLE canOpen(s_BOARD *board, CO_Data * d)
    {
    if (board != NULL && s_driver_procs.m_canOpen != NULL)
       {
@@ -212,10 +213,10 @@ CAN_HANDLE canOpen(s_BOARD *board)
       if (inst != NULL)
          {
          driver_data* data = new driver_data;
-         data->d = board->d;
+         data->d = d;
          data->inst = inst;
          data->continue_receive_thread = true;
-         CreateReceiveTask(data, &data->receive_thread);
+         CreateReceiveTask(data, &data->receive_thread, &canReceiveLoop);
          return data;
          }
       }
@@ -223,7 +224,7 @@ CAN_HANDLE canOpen(s_BOARD *board)
    }
 
 /***************************************************************************/
-int canClose(CAN_HANDLE fd0)
+int canClose(CAN_PORT fd0)
    {
    if (fd0 != NULL && s_driver_procs.m_canClose != NULL)
       {

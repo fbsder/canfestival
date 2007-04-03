@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define TIMER_HANDLE INTEGER16
 
 #include "data.h"
-#include "unix.h"
 
 /* --------- types and constants definitions --------- */
 #define TIMER_FREE 0

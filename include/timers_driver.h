@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __timer_driver_h__
 #define __timer_driver_h__
 
+#include "timerscfg.h"
 #include "timer.h"
 /*void initTimer();*/
 
@@ -34,6 +35,6 @@ void WaitReceiveTaskEnd(TASK_HANDLE);
 // For use from application
 void StartTimerLoop(TimerCallback_t init_callback);
 void StopTimerLoop(void);
-void CreateReceiveTask(CAN_PORT fd0, TASK_HANDLE* Thread, void* ReceiveLoopPtr);
+void CreateReceiveTask(CAN_PORT , TASK_HANDLE* , void* );
 
 #endif

@@ -11,8 +11,9 @@
 #include <algorithm>
 #endif
 
+extern "C" {
 #include "can_driver.h"
-
+}
 class can_uvccm_win32
    {
    public:
@@ -32,14 +33,12 @@ class can_uvccm_win32
       HANDLE m_port;
       HANDLE m_read_event;
       HANDLE m_write_event;
-      const CO_Data * m_d;
       std::string m_residual_buffer;
    };
 
 can_uvccm_win32::can_uvccm_win32(s_BOARD *board) : m_port(INVALID_HANDLE_VALUE),
       m_read_event(0),
-      m_write_event(0),
-      m_d(board->d)
+      m_write_event(0)
    {
    if (strcmp( board->baudrate, "125K") || !open_rs232(1))
       throw error();
@@ -224,7 +223,7 @@ bool can_uvccm_win32::get_can_data(const char* can_cmd_buf, long& bufsize, Messa
       }
    if (request == 'N')
       {
-      msg.rtr = NOT_A_REQUEST;
+      msg.rtr = 0;
       for (msg.len = 0; msg.len < 8; ++msg.len)
          {
          std::string data_byte_str;
@@ -254,7 +253,7 @@ bool can_uvccm_win32::get_can_data(const char* can_cmd_buf, long& bufsize, Messa
       }
    else if (request == 'R')
       {
-      msg.rtr = REQUEST;
+      msg.rtr = 1;
       buf >> msg.len;
       }
    else
@@ -274,7 +273,7 @@ bool can_uvccm_win32::set_can_data(const Message& m, std::string& can_cmd)
    // build can_uvccm_win32 command string
    std::ostringstream can_cmd_str;
    can_cmd_str << ":S" << std::hex << m.cob_id.w;
-   if (m.rtr == REQUEST)
+   if (m.rtr == 1)
       {
       can_cmd_str << 'R' << (long)m.len;
       }
@@ -299,17 +298,17 @@ bool can_uvccm_win32::set_can_data(const Message& m, std::string& can_cmd)
 extern "C"
    UNS8 _canReceive(CAN_HANDLE fd0, Message *m)
    {
-   return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->receive(m);
+   return (UNS8)reinterpret_cast<can_uvccm_win32*>(fd0)->receive(m);
    }
 
 extern "C"
-   UNS8 _canSend(CAN_HANDLE inst, const Message *m)
+   UNS8 _canSend(CAN_HANDLE fd0, Message *m)
    {
-   return (UNS8)reinterpret_cast<can_uvccm_win32*>(inst)->send(m);
+   return (UNS8)reinterpret_cast<can_uvccm_win32*>(fd0)->send(m);
    }
 
 extern "C"
-   void* _canOpen(s_BOARD *board)
+   CAN_HANDLE _canOpen(s_BOARD *board)
    {
    try
       {

@@ -28,7 +28,7 @@ void print_message(Message *m);
 
 /*UNS8 canSend(CAN_HANDLE fd0, Message *m);*/
 
-#include "unix.h"
+#include "canfestival.h"
 
 extern CAN_PORT SlaveCanHandle;
 extern CAN_PORT MasterCanHandle;

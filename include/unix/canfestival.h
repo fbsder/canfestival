@@ -15,7 +15,6 @@ typedef void* LIB_HANDLE;
 UNS8 UnLoadCanDriver(LIB_HANDLE handle);
 LIB_HANDLE LoadCanDriver(char* driver_name);
 UNS8 canSend(CAN_PORT port, Message *m);
-void canReceiveLoop(CAN_PORT port);
 CAN_PORT canOpen(s_BOARD *board, CO_Data * d);
 int canClose(CAN_PORT port);
 

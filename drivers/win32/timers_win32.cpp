@@ -74,23 +74,18 @@ void LeaveMutex(void)
 
 
 // --------------- CAN Receive Thread Implementation ---------------
-DWORD WINAPI receive_loop_thread_proc(void* arg)
-   {
-   canReceiveLoop((CAN_HANDLE)arg);
-   return 0;
-   }
 
-void CreateReceiveTask(CAN_HANDLE fd0, TASK_HANDLE* Thread)
+void CreateReceiveTask(CAN_HANDLE fd0, TASK_HANDLE* Thread, void* ReceiveLoopPtr)
    {
    unsigned long thread_id = 0;
-   *Thread = ::CreateThread(NULL, 0, &receive_loop_thread_proc, fd0, 0, &thread_id);
+   *Thread = ::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ReceiveLoopPtr, fd0, 0, &thread_id);
    }
 
-void WaitReceiveTaskEnd(TASK_HANDLE *Thread)
+void WaitReceiveTaskEnd(TASK_HANDLE Thread)
    {
-   ::WaitForSingleObject(*Thread, INFINITE);
-   ::CloseHandle(*Thread);
-   *Thread = NULL;
+   ::WaitForSingleObject(Thread, INFINITE);
+   ::CloseHandle(Thread);
+   //*Thread = NULL;
    }
 // --------------- CAN Receive Thread Implementation ---------------
 
@@ -226,7 +221,7 @@ void StartTimerLoop(TimerCallback_t init_callback)
    s_timers.start_timer_thread();
    // At first, TimeDispatch will call init_callback.
    if (init_callback != NULL)
-      SetAlarm(NULL, 0, init_callback, 0, 0);
+      SetAlarm(NULL, 0, init_callback, (TIMEVAL)0, (TIMEVAL)0);
    s_timers.resume_timer_thread();
    }
 

@@ -1,7 +1,7 @@
+LIBRARY	can_peak_win32
+	
 EXPORTS
-    TranslateBaudeRate @1
-    _canClose @2
-    _canOpen @3
-    _canReceive @4
-    _canSend @5
-    canInit @6
+    _canClose
+    _canOpen
+    _canReceive
+    _canSend

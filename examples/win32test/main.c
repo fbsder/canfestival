@@ -23,7 +23,7 @@ Copyright (C) 2007  Leonid Tochinski (ltochinski AT chattenassociates DOT com)
 #include <stdio.h>
 #include <stdlib.h> 
 #include "win32test.h"
-#include "can_driver.h"
+#include "canfestival.h"
 
 #ifdef WIN32
 #define sleep_proc(ms) Sleep(ms)
@@ -121,12 +121,13 @@ UNS8 ReadSDO(UNS8 nodeId, UNS16 index, UNS8 subIndex, UNS8 dataType, void* data,
 int main(int argc, char *argv[])
   {
    UNS8 node_id = 0;
-   s_BOARD MasterBoard = {"1", 125000, &win32test_Data};
+   s_BOARD MasterBoard = {"1", "125K"};
+   char* dll_file_name;
 
    /* process command line arguments */
    if (argc < 2)
       {
-      printf("USAGE: win32test node_id\n");
+      printf("USAGE: win32test node_id [dll_file_name]\n");
       return 1;
       }
 
@@ -137,16 +138,19 @@ int main(int argc, char *argv[])
       return 1;
       }
 
-#ifdef WIN32
+      if (argc > 2)
+		dll_file_name = argv[2];
+	  else
+		dll_file_name = "can_uvccm_win32.dll";
+
    // load can driver
-   if (!LoadCanDriver("CAN-uVCCM.dll"))
+   if (!LoadCanDriver(dll_file_name))
       {
-      printf("ERROR: could not load diver CAN-uVCCM.dll\n");
+      printf("ERROR: could not load diver %s\n", dll_file_name);
       return 1;
       }
-#endif
    
-   g_MasterCanHandle = canOpen(&MasterBoard);
+   g_MasterCanHandle = canOpen(&MasterBoard,&win32test_Data);
    
    if (g_MasterCanHandle)
       {

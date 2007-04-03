@@ -23,10 +23,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __APPLICFG_WIN32__
 #define __APPLICFG_WIN32__
 
+#include <timerscfg.h>
 #include <string.h>
 #include <stdio.h>
-
-#include "win32/timerscfg.h"
 
 // Define the architecture : little_endian or big_endian
 // -----------------------------------------------------
@@ -126,12 +125,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #endif
 
 
-#define CAN_HANDLE void*
 
-// uncomment line below if you planning to have led
-//#define LED_ENABLE
+typedef void* CAN_HANDLE;
 
-// Can driver loader
-BOOL LoadCanDriver(LPCTSTR driver_name);
+typedef void* CAN_PORT;
 
 #endif // __APPLICFG_WIN32__

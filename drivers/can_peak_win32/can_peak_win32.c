@@ -20,21 +20,17 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#if defined(WIN32) && !defined(__CYGWIN__)
+#define usleep(micro) Sleep(micro%1000 ? (micro/1000) + 1 : (micro/1000))
+#else
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
-
-/* driver pcan pci for Peak board */
-//#include "libpcan.h"
-//#include "pcan.h"
+#endif
 
 #include "cancfg.h"
 #include "can_driver.h"
-
-#if defined(WIN32) && !defined(__CYGWIN__)
-#define usleep(micro) Sleep(micro%1000 ? (micro/1000) + 1 : (micro/1000))
-#endif
 
 #ifndef extra_PCAN_init_params
 	#define extra_PCAN_init_params /**/
@@ -208,11 +204,6 @@ fail:
 CAN_HANDLE
 _canOpen (s_BOARD * board)
 {
-//  HANDLE fd0 = NULL;
-	char busname[64];
-	char *pEnd;
-	int i;
-
 #ifdef PCAN2_HEADER_
 	if(first_board != NULL && second_board != NULL)
 #else

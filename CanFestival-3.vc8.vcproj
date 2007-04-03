@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="windows-1251"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="CanFestival-3"
 	ProjectGUID="{50EF2507-9B87-4525-8B19-80EB42E67079}"
 	Keyword="Win32Proj"
@@ -266,7 +266,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./include"
+				AdditionalIncludeDirectories="./include;./include/win32"
 				PreprocessorDefinitions="WIN32;UNICODE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -493,6 +493,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\win32\canfestival.h"
+					>
+				</File>
+				<File
 					RelativePath=".\include\win32\timerscfg.h"
 					>
 				</File>
@@ -503,14 +507,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\src\win32\CanFestival-3.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\src\win32\CanFestival-3.def"
