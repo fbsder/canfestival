@@ -1,4 +1,4 @@
-
+/* from http://www.pwilson.net/getopt.html */
 
 /* getopt.h */
 /* Declarations for getopt.
