@@ -25,10 +25,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define CO_ENABLE_LSS
 
 #define MAX_CAN_BUS_ID 1
-#define SDO_DYNAMIC_BUFFER_ALLOCATION //New define, if SDO_MAX_LENGTH_TRANSFER is exceeded allocate data buffer dynamically
+#define SDO_DYNAMIC_BUFFER_ALLOCATION //New define, if SDO_MAX_LENGTH_TRANSFE is exceeded allocate data buffer dynamically
 #define SDO_DYNAMIC_BUFFER_ALLOCATION_SIZE (1024 * 128)
 #define SDO_MAX_LENGTH_TRANSFER 32
 #define SDO_MAX_SIMULTANEOUS_TRANSFERS 32
+#define SDO_BLOCK_SIZE 16
 #define NMT_MAX_NODE_ID 128
 #define SDO_TIMEOUT_MS 3000
 #define MAX_NB_TIMER 32
