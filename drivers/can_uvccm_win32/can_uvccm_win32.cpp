@@ -94,7 +94,7 @@ bool can_uvccm_win32::send(const Message *m)
 
    bool result = (bytes_written == can_cmd.size());
    
-   return false;
+   return result;
    }
 
 
